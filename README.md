@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/67ac6baa-e79f-457b-b62f-135e475276da)🔐 Flask Secure Chat App
+🔐 Flask Secure Chat App
 Ứng dụng web đơn giản mô phỏng hệ thống nhắn tin bảo mật giữa người dùng với nhau bằng Python và Flask.
 
 💡 Tính năng chính
