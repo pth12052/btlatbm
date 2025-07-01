@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Ứng dụng Chat Bảo Mật</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: #fff;
+            width: 600px;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            animation: fadeIn 0.5s ease;
+        }
+
+        h2, h3 {
+            color: #333;
+        }
+
+        .logout {
+            float: right;
+            background: #ff4d4d;
+            color: #fff;
+            padding: 6px 12px;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+
+        .logout:hover {
+            background: #d93636;
+        }
+
+        select, textarea, input, button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            transition: border 0.3s;
+        }
+
+        select:focus, textarea:focus, input:focus {
+            border-color: #4facfe;
+            outline: none;
+        }
+
+        button {
+            background: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .message-list {
+            margin-top: 30px;
+        }
+
+        .msg {
+            background: #f1f1f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .from {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .msg form {
+            margin-top: 10px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Xin chào, {{ current_user }} 
+            <a href="/logout" class="logout">Đăng xuất</a>
+        </h2>
+
+        <h3>Gửi tin nhắn</h3>
+        <form method="POST">
+            <select name="receiver" required>
+                <option value="">-- Chọn người nhận --</option>
+                {% for user in users %}
+                    {% if user != current_user %}
+                        <option value="{{ user }}">{{ user }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <textarea name="message" placeholder="Nhập nội dung..." required></textarea>
+            <button type="submit">Gửi</button>
+        </form>
+
+        <div class="message-list">
+            <h3>Hộp thư đến</h3>
+
+            {% if inbox %}
+                {% for msg in inbox %}
+                    <div class="msg">
+                        <div class="from">Từ: {{ msg['from'] }}</div>
+                        <div>Loại: {{ msg['type'] }}</div>
+
+                        {% if msg['type'] == 'key_exchange' %}
+                            <form method="POST" action="/process">
+                                <input type="hidden" name="msg_index" value="{{ loop.index0 }}">
+                                <input type="hidden" name="action" value="accept_key">
+                                <button type="submit">Chấp nhận khóa</button>
+                            </form>
+                        {% elif msg['type'] == 'message' %}
+                            <form method="POST" action="/process">
+                                <input type="hidden" name="msg_index" value="{{ loop.index0 }}">
+                                <input type="hidden" name="action" value="decrypt">
+                                <button type="submit">Giải mã & Xác thực</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>Không có tin nhắn nào.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
